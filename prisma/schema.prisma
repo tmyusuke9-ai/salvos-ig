@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MediaType {
+  REEL
+  CARROSSEL
+  ESTATICO
+  DESCONHECIDO
+}
+
+model Profile {
+  id         String   @id @default(cuid())
+  handle     String
+  profileUrl String   @unique
+  category   String
+  tags       String[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  media      Media[]
+}
+
+model Media {
+  id            String    @id @default(cuid())
+  profileId     String
+  profile       Profile   @relation(fields: [profileId], references: [id])
+  mediaUrl      String
+  caption       String?
+  publishedAt   DateTime?
+  type          MediaType @default(DESCONHECIDO)
+  category      String
+  tags          String[]
+  thumbnailUrl  String?
+  downloadPath  String?
+  transcription String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([profileId])
+  @@index([category])
+}
